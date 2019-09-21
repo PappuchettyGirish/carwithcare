@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>CARWITHCARE</title>
+    <link href="https://fonts.googleapis.com/css?family=Akronim" rel="stylesheet">
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 90%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #floating-panel {
+        position: absolute;
+        top: 10px;
+        left: 25%;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+        text-align: center;
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        padding-left: 10px;
+      }
+
+
+    </style>
+	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyABwTE2GcTvhDOMZbjG-rDVJm5JArdFHU0&libraries=places"></script>
+	 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+           <nav class="navbar navbar-inverse" style="margin-bottom:0px;">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+     <a class="navbar-brand" style="color:#fff;font-family: 'Akronim', cursive;" href="#">CARWITHCARE</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+
+      <ul class="nav navbar-nav navbar-right">
+
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user"></span> {{User}} <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="/userprofile"><span class="glyphicon glyphicon-user"></span> Profile</a></li>
+        <li><a href="/logout"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+    <div id="floating-panel" style="margin-top:4%;">
+
+
+
+
+
+        <b>Start: </b>
+        	<input type="text" id="start" required/>
+
+    <b>End: </b>
+    <input type="text" id="end" required/>
+	<button onclick="calculateRoute()" > <span class="glyphicon glyphicon-search"></span></button>
+
+	 <button type="submit" onclick="bookride()" disabled id="ridebut" >BOOK A RIDE </button>
+
+    </div>
+    <div id="map"></div>
+
+		<script>
+		var directionsService = new google.maps.DirectionsService();
+        var directionsRenderer = new google.maps.DirectionsRenderer();
+
+		 infoWindow = new google.maps.InfoWindow;
+
+        // Try HTML5 geolocation.
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            var pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+
+            infoWindow.setPosition(pos);
+            infoWindow.setContent('Location found.');
+            infoWindow.open(map);
+            map.setCenter(pos);
+          }, function() {
+            handleLocationError(true, infoWindow, map.getCenter());
+          });
+        }
+		var directionsService = new google.maps.DirectionsService();
+        var directionsRenderer = new google.maps.DirectionsRenderer();
+
+
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 17,
+          center: {lat: 12.85, lng: 77.65}
+        });
+        directionsRenderer.setMap(map);
+
+			var input = document.getElementById('start');
+			var autocomplete = new google.maps.places.Autocomplete(input);
+			google.maps.event.addListener(autocomplete, 'place_changed', function(){
+			var place = autocomplete.getPlace();
+			var location="<b>Location:</b>" + place.formatted_address + "<br/>";
+		 $('#origin1').val(place.formatted_address);
+		 $('input[name="from_long"]').val(place.geometry.location.lng());
+		$('input[name="from_lat"]').val(place.geometry.location.lat());
+		$('input[name="from_place"]').val(place.formatted_address);
+			location += "Latitude: " + place.geometry.location.lat() + "<br/>";
+			location += "Longitude: " + place.geometry.location.lng()+ "<br/>";;
+//		document.getElementById('demo').innerHTML = location;
+			});
+
+			var input1 = document.getElementById('end');
+			var autocomplete1 = new google.maps.places.Autocomplete(input1);
+			google.maps.event.addListener(autocomplete1, 'place_changed', function(){
+			var place1 = autocomplete1.getPlace();
+			var location1="<b>Location:</b>" + place1.formatted_address + "<br/>";
+		 $('#destination1').val(place1.formatted_address);
+
+		 $('input[name="to_long"]').val(place1.geometry.location.lng());
+		$('input[name="to_lat"]').val(place1.geometry.location.lat());
+		$('input[name="to_place"]').val(place1.formatted_address);
+			location1 += "Latitude: " + place1.geometry.location.lat() + "<br/>";
+			location1 += "Longitude: " + place1.geometry.location.lng()+ "<br/>";;
+//		document.getElementById('demo1').innerHTML = location1;
+			});
+
+
+	  function calculateRoute()
+{
+    document.getElementById("ridebut").disabled=false;
+	lt1=document.getElementById('from_lat').value;
+	lng1=document.getElementById('from_long').value;
+	lt2=document.getElementById('to_lat').value;
+	lng2=document.getElementById('to_long').value;
+	var st=new google.maps.LatLng(lt1,lng1);
+	var en=new google.maps.LatLng(lt2,lng2);
+	var request= {
+	origin:st,
+	destination:en,
+	travelMode:'DRIVING'
+	};
+
+	directionsService.route(request,function(result,status)
+	{
+	if(status=='OK')
+	{
+		directionsRenderer.setDirections(result);
+		calculateDistance1();
+	}
+	else
+	{
+	    alert("No Route Found");
+	}
+	});
+}
+
+
+ function calculateDistance1()
+	{
+			console.log("Entered");
+            var origin = $('#start').val();
+			console.log(origin);
+            var destination = $('#end').val();
+
+            var service = new google.maps.DistanceMatrixService();
+            service.getDistanceMatrix(
+                {
+                    origins: [origin],
+                    destinations: [destination],
+                    travelMode: google.maps.TravelMode.DRIVING,
+                    unitSystem: google.maps.UnitSystem.IMPERIAL, // miles and feet.
+                    // unitSystem: google.maps.UnitSystem.metric, // kilometers and meters.
+                    avoidHighways: false,
+                    avoidTolls: false
+                }, callback);
+        }
+
+	        function callback(response, status) {
+            if (status != google.maps.DistanceMatrixStatus.OK) {
+				console.log("Error");
+                $('#result').html(err);
+            }
+			else {
+                var origin = response.originAddresses[0];
+				console.log(origin);
+                var destination = response.destinationAddresses[0];
+                if (response.rows[0].elements[0].status === "ZERO_RESULTS") {
+                    $('#result').html("Better get on a plane. There are no roads between "  + origin + " and " + destination);
+                } else {
+                    var distance = response.rows[0].elements[0].distance;
+                    var duration = response.rows[0].elements[0].duration;
+					console.log(distance);
+                    console.log(response.rows[0].elements[0].distance);
+                    var distance_in_kilo = distance.value / 1000; // the kilom
+                    var distance_in_mile = distance.value / 1609.34; // the mile
+                    var duration_text = duration.text;
+                    var duration_value = duration.value;
+                    $('#in_mile').text(distance_in_mile.toFixed(2));
+                    $('#in_kilo').text(distance_in_kilo.toFixed(2));
+                    $('#duration_text').text(duration_text);
+                    $('#duration_value').text(duration_value);
+                    $('#from').text(origin);
+                    $('#to').text(destination);
+                    $('input[name="distance"]').val(distance_in_kilo.toFixed(2));
+		            $('input[name="time"]').val(duration_text);
+                }
+            }
+        }
+
+		function bookride()
+		{
+		    var msg="BELOW ARE THE REQUESTED RIDE DETAILS. PRESS OK TO CONFIRM !! \n";
+		    var fr=document.getElementById("from").innerHTML;
+		    var to=document.getElementById("to").innerHTML;
+		    var d=document.getElementById("in_kilo").innerHTML;
+		    var t=document.getElementById("duration_text").innerHTML;
+		    var msg=msg+"\nFrom : "+fr+ "\n"+"To : "+to+"\n"+"Distance in KM: "+d+"\n"+"Expected time to reach : "+t;
+		    console.log(msg);
+		    var cnt=document.getElementById("ride_count").innerHTML;
+		    console.log(cnt);
+		    if (cnt==0)
+		    {
+		    if (confirm(msg))
+		    {
+			 $('#submitride').click();
+		    }}
+		    else
+		    {
+		        alert("Please cancel the requested ride to book a new ride through profile tab");
+		    }
+
+		}
+    </script>
+
+ <div class="container">
+ <div class="row">
+
+     <div class="col-md-6">
+
+
+<div id="result" style="display:none;">
+    <ul class="list-group">
+        <li  class="list-group-item d-flex justify-content-between align-items-center">
+            Distance In Mile :
+            <span id="in_mile" class="badge badge-primary badge-pill"></span>
+        </li>
+        <li  class="list-group-item d-flex justify-content-between align-items-center">
+            Distance is Kilo:
+            <span id='in_kilo' class="badge badge-primary badge-pill"></span>
+        </li>
+        <li  class="list-group-item d-flex justify-content-between align-items-center">
+            IN TEXT:
+            <span id="duration_text" class="badge badge-primary badge-pill"></span>
+        </li>
+        <li  class="list-group-item d-flex justify-content-between align-items-center">
+            IN MINUTES:
+            <span id="duration_value" class="badge badge-primary badge-pill"></span>
+        </li>
+
+        <li  class="list-group-item d-flex justify-content-between align-items-center">
+            FROM:
+            <span id="from" class="badge badge-primary badge-pill"></span>
+        </li>
+        <li  class="list-group-item d-flex justify-content-between align-items-center">
+            TO:
+            <span id="to" class="badge badge-primary badge-pill"></span>
+        </li>
+    </ul>
+</div>
+</div>
+</div>
+</div>
+{%for rid in ridescount%}
+<p style="display:none;" id="ride_count" >{{rid.count}}</p>
+{%endfor%}
+<form method="POST" action="/user/" style="display:none;">
+    {% csrf_token %}
+    <input type="text" name="username" id="r_username" value={{User}} />
+    <input type="text" name="from_long" id="from_long" value="" />
+    <input type="text" name="from_lat" id="from_lat" />
+    <input type="text" name="from_place" id="from_place" />
+    <input type="text" name="to_long" id="to_long" />
+    <input type="text" name="to_lat" id="to_lat" />
+    <input type="text" name="to_place" id="to_place" />
+    <input type="text" name="distance" id="distance" />
+    <input type="text" name="time" id="time" />
+    <input type="submit" name="action" id="submitride" value="USERRIDE" />
+</form>
+
+  </body>
+</html>

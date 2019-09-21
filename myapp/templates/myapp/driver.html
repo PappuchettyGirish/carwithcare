@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+<style>
+
+
+   #map {
+        height: 300px;
+		width:70%;
+		    position: absolute;
+    overflow: hidden;
+    margin-bottom: 10%;
+    margin-top: 3%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+
+      #description {
+        font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+      }
+
+      #infowindow-content .title {
+        font-weight: bold;
+      }
+
+      #infowindow-content {
+        display: none;
+      }
+
+      #map #infowindow-content {
+        display: inline;
+      }
+
+      .pac-card {
+        margin: 10px 10px 0 0;
+        border-radius: 2px 0 0 2px;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        outline: none;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        background-color: #fff;
+        font-family: Roboto;
+      }
+
+      #pac-container {
+        padding-bottom: 12px;
+        margin-right: 12px;
+      }
+
+      .pac-controls {
+        display: inline-block;
+        padding: 5px 11px;
+      }
+
+      .pac-controls label {
+        font-family: Roboto;
+        font-size: 13px;
+        font-weight: 300;
+      }
+
+      #pac-input {
+        background-color: #fff;
+        font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+        margin-left: 12px;
+        padding: 6px 14px 0 4px;
+        text-overflow: ellipsis;
+        width: 400px;
+      }
+
+      #pac-input:focus {
+        border-color: #4d90fe;
+      }
+
+      #title {
+        color: #fff;
+        background-color: #4d90fe;
+        font-size: 25px;
+        font-weight: 500;
+        padding: 6px 12px;
+      }
+      #target {
+        width: 345px;
+      }
+
+body
+{
+    font-family: 'Open Sans', sans-serif;
+}
+
+.fb-profile img.fb-image-lg{
+    z-index: 0;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.fb-image-profile
+{
+    margin: -90px 10px 0px 50px;
+    z-index: 9;
+    width: 20%;
+}
+
+@media (max-width:768px)
+{
+
+.fb-profile-text>h1{
+    font-weight: 700;
+    font-size:16px;
+}
+
+.fb-image-profile
+{
+    margin: -45px 10px 0px 25px;
+    z-index: 9;
+    width: 20%;
+}
+}
+
+
+.buttoncomplete {
+  background-color: green;
+  color: white;
+  border-radius:25px;
+  border:none;
+
+}
+
+.button {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 7px 22px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  -webkit-transition-duration: 0.4s; /* Safari */
+  transition-duration: 0.4s;
+  cursor: pointer;
+}
+.buttonicon {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  -webkit-transition-duration: 0.4s; /* Safari */
+  transition-duration: 0.4s;
+  cursor: pointer;
+}
+.button1 {
+  background-color: #f05;
+  color: white;
+  border-radius:25px;
+  border:none;
+
+}
+
+.buttoncomplete:hover {
+  background-color: white;
+  color: #f05;
+  font-size:16px;
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+}
+
+.button1:hover {
+  background-color: white;
+  color: #f05;
+  font-size:16px;
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+}
+#waitlist
+{
+    display:none;
+}
+#rides
+{
+    display:none;
+}
+</style>
+<title>CARWITHCARE</title>
+ <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<script>
+
+    function showfunc()
+    {
+
+
+
+        document.getElementById("rides").style.display="none";
+        document.getElementById("waitlist").style.display="block";
+
+
+    }
+    function showrides()
+    {
+
+        document.getElementById("waitlist").style.display="none";
+        document.getElementById("rides").style.display="block";
+    }
+
+</script>
+{% load staticfiles%}
+
+</head>
+<body>
+    <script>
+
+    </script>
+<div class="container">
+    <div class="row">
+
+    <div class="fb-profile">
+
+        <img align="left" class="fb-image-lg" src="{%static 'img/cover.JPG'%}" alt="Profile image example"/>
+
+        <div class="col-md-9">
+        {%for user in user_name%}
+        <img align="left" class="fb-image-profile thumbnail" src="{{user.image.url}}" alt="Profile image example"/>
+
+        <div class="fb-profile-text">
+
+            <h1>Hello {{myname}}</h1>
+            {%endfor%}
+            <button class="button button1" onclick="showrides()">MY RIDES</button>
+            <button class="button button1" onclick="showfunc()">Waiting Rides</button>
+
+        </div>
+
+
+
+        </div>
+        <form style="display:none;" action='/driver/'>
+            {%csrf_token%}
+            <input type="text" value="some" id="driver_lat" name="driverlat">
+            <input type="text" value="some" id="driver_lng" name="driverlong">
+            <input type="submit" name="action" id="getlist" value="GETLIST" >
+        </form>
+
+    </div>
+    <div class="col-md-3">
+        <form method="POST" action="/logoutdriver/" >
+            {%csrf_token%}
+        <input id="lgb"  class=" button button1" type="submit" value="LOGOUT"/>
+        </form>
+    </div>
+
+
+    <div class="col-md-10" id="rides" style="margin-top:3%;margin-bottom:3%;">
+        <table class="table-bordered">
+            <thead>
+            <tr>
+                <th>Requested username</th>
+                <th>Requested Emailid</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Staus</th>
+                <th>Complete/Cancel</th>
+            </tr>
+            </thead>
+            <tbody>
+        {%for ride in rides%}
+            <tr>
+                <td>{{ride.username}}</td>
+                <input type="text" id="{{forloop.counter}}.ride_id" name="ride_id" value="{{ride.id}}" style="display:none" />
+                <td>{{ride.emailid}}</td>
+                <td>{{ride.fromplace}}</td>
+                <td>{{ride.toplace}}</td>
+                <td>{{ride.status}}</td>
+                {% if ride.status == 'accepted' %}
+                <td><button class="button button1" id="cancl" onclick="ridecancel(document.getElementById('{{forloop.counter}}.ride_id').value)">CANCEL</button>
+                <button id="complte" class="button buttoncomplete" onclick="ridecomplete(document.getElementById('{{forloop.counter}}.ride_id').value)">COMPLETE</button></td>
+                {%endif%}
+            </tr>
+        {%endfor%}
+         </tbody>
+        </table>
+            <form  method="POST" style="display:none;" action="/driver/">
+			{% csrf_token  %}
+			<input type="text" name="ride_id" value="some"/>
+			<button id="cancel" type="submit" name="action" value="RIDE_CANCEL" class="buttonicon button1"><i class="fa fa-search"></i></button>
+			</form>
+			<form  method="POST" style="display:none;" action="/driver/">
+			{% csrf_token  %}
+			<input type="text" name="ride_id" value="some"/>
+			<button id="complete" type="submit" name="action" value="RIDE_COMPLETE" class="buttonicon button1"><i class="fa fa-search"></i></button>
+			</form>
+
+        <script>
+            function ridecancel(a){
+	                $('input[name="ride_id"]').val(a);
+        	        $( "#cancel" ).click();
+                	}
+            function ridecomplete(a){
+	                $('input[name="ride_id"]').val(a);
+        	        $( "#complete" ).click();
+                	}
+        </script>
+    </div>
+    <div class="col-md-10" id="waitlist" style="margin-top:3%;margin-bottom:3%;">
+        {%for c in ridescount %}
+
+          {%if c.count == 0 %}
+        <table class="table-bordered">
+            <thead>
+            <tr>
+                <th style="padding:5px;">Requested username</th>
+                <th style="padding:5px;">Requested Emailid</th>
+                <th style="padding:5px;">From</th>
+                <th style="padding:5px;">To</th>
+                <th style="padding:5px;">Accept/Reject</th>
+            </tr>
+            </thead>
+            <tbody>
+
+
+        {% for i in waitrides %}
+
+            <tr>
+                <td style="padding:5px;">{{i.username}}</td>
+                <input type="text" id="{{forloop.counter}}.res_id" name="res_id" value="{{i.id}}" style="display:none" />
+                <input type="text" id="{{forloop.counter}}.res_emailid" name="res_emailid" value="{{i.emailid}}" style="display:none" />
+                <input type="text" id="{{forloop.counter}}.res_actdriveremail" name="res_actdriveremail" value="{{i.act_driveremail}}" style="display:none" />
+                <input type="text" id="{{forloop.counter}}.res_driveremail" name="res_driveremail" value="{{i.drivermail}}" style="display:none" />
+                <input type="text" id="{{forloop.counter}}.res_fromplace" name="res_fromplace" value="{{i.fromplace}}" style="display:none" />
+                <input type="text" id="{{forloop.counter}}.res_toplace" name="res_toplace" value="{{i.toplace}}" style="display:none" />
+                <td style="padding:5px;">{{i.emailid}}</td>
+                <td style="padding:5px;">{{i.fromplace}}</td>
+                <td style="padding:5px;">{{i.toplace}}</td>
+                <td style="padding:5px;"><button id="acept" onclick="resformacceptsubmit(document.getElementById('{{forloop.counter}}.res_id').value,document.getElementById('{{forloop.counter}}.res_emailid').value,document.getElementById('{{forloop.counter}}.res_fromplace').value,document.getElementById('{{forloop.counter}}.res_toplace').value,document.getElementById('{{forloop.counter}}.res_driveremail').value)" class="button button1">ACCEPT</button>
+                </td>
+            </tr>
+            {% endfor %}
+
+
+            </tbody>
+        </table>
+        {%else%}
+        <h2>Currently you have accepted a ride. So please complete ride to see waiting rides.</h2>
+        {%endif%}
+
+{%endfor%}
+<form id="resformaccept" method="POST" style="display:none;" action="/driver/">
+			{% csrf_token  %}
+			<input type="text" name="resp_id" value="some"/>
+			<input type="text" name="resp_emailid" value="some"/>
+			<input type="text" name="resp_fromplace" value="some"/>
+			<input type="text" name="resp_toplace" value="some"/>
+			<input type="text" name="resp_driveremail" value="some"/>
+			<button id="accept" type="submit" name="action" value="RESPONSE_ACCEPT" class="buttonicon button1"><i class="fa fa-search"></i></button>
+			</form>
+			<form id="resformreject" method="POST" style="display:none;" action="/driver/">
+                	{% csrf_token  %}
+	                <input type="text" name="resp_id" value="some"/>
+		        	<input type="text" name="resp_emailid" value="some"/>
+			        <input type="text" name="resp_fromplace" value="some"/>
+			        <input type="text" name="resp_toplace" value="some"/>
+			        <input type="text" name="resp_driveremail" value="some"/>
+			 <button id="reject" type="submit" name="action" value="RESPONSE_REJECT" class="buttonicon button1"><i class="fa fa-search"></i></button>
+                	</form>
+                	<script>
+        	        function resformacceptsubmit(a,b,c,d,e){
+	                $('input[name="resp_id"]').val(a);
+	                $('input[name="resp_emailid"]').val(b);
+	                $('input[name="resp_fromplace"]').val(c);
+	                $('input[name="resp_toplace"]').val(d);
+	                $('input[name="resp_driveremail"]').val(e);
+        	        $( "#accept" ).click();
+                	}
+			function resformrejectsubmit(a,b,c,d,e){
+        	        $('input[name="resp_id"]').val(a);
+        	        $('input[name="resp_emailid"]').val(b);
+	                $('input[name="resp_fromplace"]').val(c);
+	                $('input[name="resp_toplace"]').val(d);
+	                $('input[name="resp_driveremail"]').val(e);
+                	$( "#reject" ).click();
+	                }
+        	        </script>
+
+    </div>
+    </div>
+</div> <!-- /container -->
+</body>
+</html>
